@@ -9,12 +9,14 @@ import time
 
 
 class CheckIfMp3():
-    def __init__(self,album=None):
+    def __init__(self,album=None,artist=None,genre=None):
+        self.artist = artist
+        self.genre = genre
         self.album = album
         self.BaseDir = 'AlbumEditor/Rawmp3'
         self.NoIDFolder = 'AlbumEditor/FolderForMp3/NoID'
         self.mp3Folder = 'AlbumEditor/FolderForMp3'
-        self.NotMp3Folder = 'RAW Files'
+        self.NotMp3Folder = 'mp4Files_dir'
         self.MoveDir = 'AlbumEditor/ReadyToExportmp3'
         self.GetMp3()
         self.CheckMp3()
@@ -35,23 +37,38 @@ class CheckIfMp3():
         try:
             faudio = EasyID3(mp3Path)
         except Exception as e:
+            print(e)
             try:
                 faudio = mutagen.File(mp3Path, easy=True)
                 faudio.add_tags()
             except Exception as e:
                 print(e)
-                time.sleep(5)
+                # time.sleep(5)
+                print('NONE')
                 return None
-        print('\n\n\nFAUDIO',faudio)
         if fname is not None:
             faudio['title']=fname
         else:
             faudio['title']='Unknown Title'
+
         if self.album is not None:
             faudio['album'] = self.album
         else:
-            faudio['album'] = 'My Decade Old Songs'
-        faudio['artist'] = 'JCD'
+            faudio['album'] = 'Lucban Bes'
+
+        if self.artist is not None:
+            faudio['artist'] = self.artist
+        else:
+            faudio['artist'] = 'JCD'
+
+        if self.genre is not None:
+            faudio['genre'] = self.genre
+        else:
+            try:
+                faudio.pop('genre')
+            except:
+                pass
+
         faudio['albumartist'] = 'JCD'
         newTitle = ''.join([i for i in re.sub("\s\s+", " ",re.sub(r'[^a-zA-Z0-9 \n\.]', ' ', faudio['title'][0])) if not i.isdigit()]).lstrip(' ').rstrip()
         faudio['title'] = re.sub(r"\.",'',newTitle)
@@ -88,6 +105,15 @@ class CheckIfMp3():
 
 
     def GetMp3(self):
+        print(f"""
+Segragating MP3 to None MP3
+Mp3 will be moved to 
+        {self.BaseDir}
+
+None Mp3 moved to 
+        {self.NotMp3Folder}
+        """)
+    
         FileList = [f for f in listdir(self.BaseDir)]
         mp3N=0
         notAudioMp3=0
@@ -114,4 +140,7 @@ class CheckIfMp3():
             print(e,'\n\n')
 
 # CheckIfMp3()
-CheckIfMp3('Lucban Best').CheckMp3()
+# Change Album and Singer HEre
+# CheckIfMp3('Love Songs','JCD','Love').CheckMp3()
+CheckIfMp3('Hymns','JCD','Religious Songs').CheckMp3()
+# album=None,artist=None,genre=None
